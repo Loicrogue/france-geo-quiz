@@ -36,7 +36,7 @@ export default function FranceMap({
       const projection = d3.geoConicConformal()
         .center([2.454071, 46.279229])
         .scale(2800)
-        .translate([width / 2, height / 2])
+        .translate([width / 2, height / 2 - 120])
 
       const path = d3.geoPath().projection(projection)
 
