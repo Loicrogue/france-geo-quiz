@@ -10,9 +10,6 @@ export default function TrainingMode() {
     trainingQueue,
     currentTrainingIndex,
     trainingRevealed,
-    streak,
-    totalCorrect,
-    totalSeen,
     initTraining,
     nextTraining,
     revealTraining,
@@ -45,8 +42,6 @@ export default function TrainingMode() {
     nextTraining()
   }
 
-  const accuracy = totalSeen > 0 ? Math.round((totalCorrect / totalSeen) * 100) : 0
-
   return (
     <div className="min-h-screen bg-background-yellow-monSite flex flex-col">
 
@@ -59,10 +54,8 @@ export default function TrainingMode() {
           ← Accueil
         </button>
         <h1 className="text-lg font-bold text-yellow-900">🎯 Mode Entraînement</h1>
-        <div className="flex gap-4 text-sm text-gray-600">
-          <span>🔥 {streak}</span>
-          <span>✅ {accuracy}%</span>
-          <span className="text-gray-400">{totalSeen} vus</span>
+        <div className="flex opacity-0">
+          <span>← Accueil</span> {/* placeholder text */}
         </div>
       </div>
 
@@ -75,7 +68,6 @@ export default function TrainingMode() {
             highlightedCode={current.code}
             correctCode={feedback === 'correct' ? current.code : undefined}
             revealCode={feedback === 'wrong' && trainingRevealed ? current.code : undefined}
-            onDepartmentClick={(code, name) => console.log(code, name)}
           />
         </div>
 

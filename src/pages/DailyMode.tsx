@@ -9,7 +9,12 @@ const MAX_GUESSES = 10
 
 export default function DailyMode() {
   const navigate = useNavigate()
-  const { initDaily, submitDailyGuess } = useGameStore()
+  const { 
+    streak,
+    initDaily, 
+    submitDailyGuess,
+    recordResult
+  } = useGameStore()
   
   // On lit daily directement à chaque render sans le destructurer
   const daily = useGameStore(state => state.daily)
@@ -22,8 +27,7 @@ export default function DailyMode() {
     if (initRef.current) return
     initRef.current = true
     initDaily()
-    localStorage.setItem('isAllowed', 'true')
-  }, [])
+  }, [initDaily])
 
   if (!daily) return null
 
@@ -42,7 +46,7 @@ export default function DailyMode() {
 
   const handleGuess = () => {
     if (!userInput.trim() || isFinished) return
-
+    
     const result = submitDailyGuess(userInput.trim())
 
     if (result === 'already_guessed') {
@@ -56,14 +60,20 @@ export default function DailyMode() {
     const remaining = MAX_GUESSES - newGuesses.length
 
     if (result === 'correct') {
+      recordResult(true)
       setMessage({ text: '🎉 Bravo, bonne réponse !', type: 'info' })
     } else if (newStatus === 'lost') {
+      recordResult(false)
       setMessage({ text: `💀 Perdu ! C'était ${department.name}`, type: 'error' })
     } else {
       setMessage({ text: `❌ Raté ! Il te reste ${remaining} essai${remaining > 1 ? 's' : ''}`, type: 'error' })
     }
 
     setUserInput('')
+  }
+
+  const serieStreak = () => {
+    return streak <= 1 ? "jour" : "jours";
   }
 
   return (
@@ -75,9 +85,7 @@ export default function DailyMode() {
           ← Accueil
         </button>
         <h1 className="text-lg font-bold text-green-900">🗓️ Département du Jour</h1>
-        <div className="text-sm text-gray-500">
-          {new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' })}
-        </div>
+        <span>Série de {streak} {serieStreak()}  🔥</span>
       </div>
 
       <div className="flex flex-col lg:flex-row flex-1 gap-4 p-4 max-w-6xl mx-auto w-full">

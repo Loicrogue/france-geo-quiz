@@ -25,7 +25,6 @@ export default function FranceMap({
   const svgRef = useRef<SVGSVGElement>(null)
 
   useEffect(() => {
-    console.log('FranceMap render — revealCode:', revealCode, 'correctCode:', correctCode)
     const loadMap = async () => {
       const geojson: FeatureCollection = await fetch('/departments.geojson').then(r => r.json())
 
