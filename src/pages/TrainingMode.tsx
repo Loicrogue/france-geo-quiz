@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import FranceMap from '../components/map/FranceMap'
+import DepartmentAutocomplete from '../components/DepartmentAutocomplete'
 import { useGameStore } from '../store/gameStore'
 
 export default function TrainingMode() {
@@ -23,7 +24,7 @@ export default function TrainingMode() {
 
   useEffect(() => {
     if (trainingQueue.length === 0) initTraining()
-  }, [])
+  }, [initTraining, trainingQueue.length])
 
   const current = trainingQueue[currentTrainingIndex]
   if (!current) return null
@@ -42,12 +43,6 @@ export default function TrainingMode() {
     setUserInput('')
     setFeedback(null)
     nextTraining()
-  }
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key !== 'Enter') return
-    if (feedback) handleNext()
-    else if (userInput.trim()) handleGuess()
   }
 
   const accuracy = totalSeen > 0 ? Math.round((totalCorrect / totalSeen) * 100) : 0
@@ -79,6 +74,7 @@ export default function TrainingMode() {
           <FranceMap
             highlightedCode={current.code}
             correctCode={feedback === 'correct' ? current.code : undefined}
+            revealCode={feedback === 'wrong' && trainingRevealed ? current.code : undefined}
             onDepartmentClick={(code, name) => console.log(code, name)}
           />
         </div>
@@ -96,14 +92,12 @@ export default function TrainingMode() {
           <div className="bg-white rounded-2xl shadow-lg p-6 flex flex-col gap-4">
             {!feedback ? (
               <>
-                <input
-                  type="text"
+                <DepartmentAutocomplete
                   value={userInput}
-                  onChange={e => setUserInput(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  placeholder="Nom du département..."
-                  autoFocus
-                  className="border-2 border-gray-200 rounded-xl px-4 py-3 text-lg focus:outline-none focus:border-yellow-400 transition"
+                  onChange={v => setUserInput(v)}
+                  onSubmit={handleGuess}
+                  accentColor="yellow"
+                  showCode={false}
                 />
                 <button
                   onClick={handleGuess}

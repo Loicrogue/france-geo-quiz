@@ -10,22 +10,24 @@ interface DepartmentProperties {
 interface FranceMapProps {
   highlightedCode?: string
   onDepartmentClick?: (code: string, name: string) => void
-  guessedCodes?: string[]
+  wrongCodes?: string[]
   correctCode?: string
+  revealCode?: string
 }
 
 export default function FranceMap({
   highlightedCode,
   onDepartmentClick,
-  guessedCodes = [],
+  wrongCodes = [],
   correctCode,
+  revealCode,
 }: FranceMapProps) {
   const svgRef = useRef<SVGSVGElement>(null)
 
   useEffect(() => {
+    console.log('FranceMap render — revealCode:', revealCode, 'correctCode:', correctCode)
     const loadMap = async () => {
-      const geojson: FeatureCollection = await fetch('/departments.geojson')
-        .then(r => r.json())
+      const geojson: FeatureCollection = await fetch('/departments.geojson').then(r => r.json())
 
       const svg = d3.select(svgRef.current)
       svg.selectAll('*').remove()
@@ -39,20 +41,21 @@ export default function FranceMap({
         .translate([width / 2, height / 2 - 120])
 
       const path = d3.geoPath().projection(projection)
-
       const g = svg.append('g')
+
+      const getFill = (code: string) => {
+        if (code === correctCode) return '#22c55e'
+        if (code === revealCode) return '#f97316'
+        if (wrongCodes.includes(code)) return '#f87171'
+        if (code === highlightedCode) return '#3b82f6'
+        return '#e2e8f0'
+      }
 
       g.selectAll('path')
         .data(geojson.features)
         .join('path')
         .attr('d', feature => path(feature as Feature<Geometry>)!)
-        .attr('fill', feature => {
-          const code = (feature.properties as DepartmentProperties).code
-          if (code === correctCode) return '#22c55e'
-          if (guessedCodes.includes(code)) return '#f87171'
-          if (code === highlightedCode) return '#3b82f6'
-          return '#e2e8f0'
-        })
+        .attr('fill', feature => getFill((feature.properties as DepartmentProperties).code))
         .attr('stroke', '#fff')
         .attr('stroke-width', 0.8)
         .style('cursor', onDepartmentClick ? 'pointer' : 'default')
@@ -63,24 +66,15 @@ export default function FranceMap({
         })
         .on('mouseover', function (_, feature) {
           const code = (feature.properties as DepartmentProperties).code
-          if (code !== highlightedCode && code !== correctCode && !guessedCodes.includes(code)) {
+          if (code !== highlightedCode && code !== correctCode && code !== revealCode && !wrongCodes.includes(code)) {
             d3.select(this).attr('fill', '#93c5fd')
           }
         })
         .on('mouseout', function (_, feature) {
           const code = (feature.properties as DepartmentProperties).code
-          if (code === correctCode) {
-            d3.select(this).attr('fill', '#22c55e')
-          } else if (guessedCodes.includes(code)) {
-            d3.select(this).attr('fill', '#f87171')
-          } else if (code === highlightedCode) {
-            d3.select(this).attr('fill', '#3b82f6')
-          } else {
-            d3.select(this).attr('fill', '#e2e8f0')
-          }
+          d3.select(this).attr('fill', getFill(code))
         })
 
-      // Labels numéros de département
       g.selectAll('text')
         .data(geojson.features)
         .join('text')
@@ -97,7 +91,7 @@ export default function FranceMap({
     }
 
     loadMap()
-  }, [highlightedCode, guessedCodes, correctCode, onDepartmentClick])
+  }, [highlightedCode, wrongCodes, correctCode, revealCode, onDepartmentClick])
 
   return (
     <svg
