@@ -7,7 +7,7 @@ export default function Home() {
   if (localStorage.getItem("isAllowed")== null) {
     localStorage.setItem("isAllowed","false")
   }
-  const isAllowed = localStorage.getItem("isAllowed")
+  const isAllowed = localStorage.getItem("isAllowed") ?? "false"
   function showItem(isAllowed : string) {
     return isAllowed == "true"
   }
