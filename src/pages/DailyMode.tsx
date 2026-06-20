@@ -4,6 +4,7 @@ import FranceMap from '../components/map/FranceMap'
 import DepartmentAutocomplete from '../components/DepartmentAutocomplete'
 import { useGameStore } from '../store/gameStore'
 import { departments } from '../data/departments'
+import useResponsive from '../hooks/useResponsive'
 
 const MAX_GUESSES = 10
 
@@ -15,6 +16,7 @@ export default function DailyMode() {
     submitDailyGuess,
     recordResult
   } = useGameStore()
+  const { isMobile } = useResponsive()
   
   // On lit daily directement à chaque render sans le destructurer
   const daily = useGameStore(state => state.daily)
@@ -72,10 +74,6 @@ export default function DailyMode() {
     setUserInput('')
   }
 
-  const serieStreak = () => {
-    return streak <= 1 ? "jour" : "jours";
-  }
-
   return (
     <div className="min-h-screen bg-background-green-monSite flex flex-col">
 
@@ -85,7 +83,7 @@ export default function DailyMode() {
           ← Accueil
         </button>
         <h1 className="text-lg font-bold text-green-900">🗓️ Département du Jour</h1>
-        <span>Série de {streak} {serieStreak()}  🔥</span>
+        <span>{isMobile ? "" : "Série de "}{streak} {streak <= 1 ? "jour" : "jours"}  🔥</span>
       </div>
 
       <div className="flex flex-col lg:flex-row flex-1 gap-4 p-4 max-w-6xl mx-auto w-full">

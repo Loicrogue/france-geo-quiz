@@ -5,7 +5,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background-monSite flex flex-col items-center justify-center gap-8 p-4">
-      <h1 className="text-4xl font-bold text-blue-900">Bienvenue sur France Géo Quiz</h1>
+      <h1 className="text-4xl font-bold text-center text-blue-900">Bienvenue sur France Géo Quiz</h1>
       <div className="flex flex-col gap-4 w-64">
         <button
           onClick={() => navigate('/daily')}
