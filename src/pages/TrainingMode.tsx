@@ -13,7 +13,6 @@ export default function TrainingMode() {
     initTraining,
     nextTraining,
     revealTraining,
-    recordResult,
   } = useGameStore()
 
   const [userInput, setUserInput] = useState('')
@@ -32,7 +31,6 @@ export default function TrainingMode() {
   const handleGuess = () => {
     const isCorrect = normalize(userInput) === normalize(current.name)
     setFeedback(isCorrect ? 'correct' : 'wrong')
-    recordResult(isCorrect)
     if (!isCorrect) revealTraining()
   }
 
@@ -99,7 +97,7 @@ export default function TrainingMode() {
                   Valider
                 </button>
                 <button
-                  onClick={() => { revealTraining(); recordResult(false) }}
+                  onClick={() => { revealTraining() }}
                   className="text-gray-400 text-sm hover:text-gray-600 transition cursor-pointer"
                 >
                   Je ne sais pas
