@@ -15,6 +15,10 @@ interface FranceMapProps {
   revealCode?: string
 }
 
+// Dimensions fixes qui correspondent au viewBox
+const WIDTH = 800
+const HEIGHT = 800
+
 export default function FranceMap({
   highlightedCode,
   onDepartmentClick,
@@ -31,13 +35,11 @@ export default function FranceMap({
       const svg = d3.select(svgRef.current)
       svg.selectAll('*').remove()
 
-      const width = svgRef.current!.clientWidth
-      const height = svgRef.current!.clientHeight
-
+      // On utilise les dimensions fixes du viewBox, pas clientWidth/clientHeight
       const projection = d3.geoConicConformal()
         .center([2.454071, 46.279229])
-        .scale(2800)
-        .translate([width / 2, height / 2 - 120])
+        .scale(4200)
+        .translate([WIDTH / 2, HEIGHT / 2])
 
       const path = d3.geoPath().projection(projection)
       const g = svg.append('g')
@@ -96,7 +98,7 @@ export default function FranceMap({
     <svg
       ref={svgRef}
       className="w-full h-full"
-      viewBox="0 0 800 600"
+      viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
       preserveAspectRatio="xMidYMid meet"
     />
   )
