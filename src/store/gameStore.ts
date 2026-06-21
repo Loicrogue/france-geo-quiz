@@ -10,17 +10,22 @@ interface DailyState {
   status: 'playing' | 'won' | 'lost'
 }
 
+interface TrainingResult {
+  code: string
+  correct: boolean
+}
+
 interface GameStore {
   // Mode entraînement
   trainingQueue: Department[]
   currentTrainingIndex: number
   trainingRevealed: boolean
-  dailyRevealed: boolean
-  streakTraining: number
+  trainingHistory: TrainingResult[]
 
   // Mode daily
   daily: DailyState | null
   streakDaily: number
+  dailyRevealed: boolean
 
   // Actions entraînement
   initTraining: () => void
@@ -30,10 +35,10 @@ interface GameStore {
   
   // Actions daily
   initDaily: () => void
-  nextDaily: () => void  
   revealDaily: () => void
   recordResultDaily: (correct: boolean) => void
   submitDailyGuess: (guess: string) => 'correct' | 'wrong' | 'already_guessed'
+  nextDaily: () => void
 }
 
 function shuffle<T>(arr: T[]): T[] {
@@ -53,49 +58,58 @@ export const useGameStore = create<GameStore>()(
       trainingQueue: [],
       currentTrainingIndex: 0,
       trainingRevealed: false,
+      trainingHistory: [],
       dailyRevealed: false,
       streakDaily: 0,
-      streakTraining: 0,
       daily: null,
 
       initTraining: () => set({
         trainingQueue: shuffle(departments),
         currentTrainingIndex: 0,
         trainingRevealed: false,
+        trainingHistory: [],
       }),
 
       nextTraining: () => {
         const { currentTrainingIndex, trainingQueue } = get()
         const next = currentTrainingIndex + 1
         if (next >= trainingQueue.length) {
-          set({ trainingQueue: shuffle(departments), currentTrainingIndex: 0, trainingRevealed: false })
+          // Tous les départements faits → on repart avec une liste vierge
+          set({
+            trainingQueue: shuffle(departments),
+            currentTrainingIndex: 0,
+            trainingRevealed: false,
+            trainingHistory: [],
+          })
         } else {
           set({ currentTrainingIndex: next, trainingRevealed: false })
         }
       },
 
-      nextDaily: () => set({ dailyRevealed: false }),
-
       revealTraining: () => set({ trainingRevealed: true }),
 
+      recordResultTraining: (correct) => {
+        const { trainingQueue, currentTrainingIndex } = get()
+        const current = trainingQueue[currentTrainingIndex]
+        set(state => ({
+          trainingHistory: [
+            ...state.trainingHistory,
+            { code: current.code, correct }
+          ],
+        }))
+      },
+
+      nextDaily: () => set({ dailyRevealed: false }),
       revealDaily: () => set({ dailyRevealed: true }),
 
       recordResultDaily: (correct) => set(state => ({
         streakDaily: correct ? state.streakDaily + 1 : 0,
       })),
 
-      recordResultTraining: (correct) => set(state => ({
-        streakTraining: correct ? state.streakTraining + 1 : 0,
-      })),
-
       initDaily: () => {
         const todayKey = getTodayKey()
         const existing = get().daily
-
-        // Déjà initialisé aujourd'hui → on garde
         if (existing?.todayKey === todayKey) return
-
-        // Nouveau jour
         set({
           daily: {
             todayKey,
@@ -125,10 +139,7 @@ export const useGameStore = create<GameStore>()(
             ? 'lost'
             : 'playing'
 
-        set({
-          daily: { ...daily, guesses: newGuesses, status: newStatus }
-        })
-
+        set({ daily: { ...daily, guesses: newGuesses, status: newStatus } })
         return isCorrect ? 'correct' : 'wrong'
       },
     }),

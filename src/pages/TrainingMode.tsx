@@ -10,7 +10,7 @@ export default function TrainingMode() {
     trainingQueue,
     currentTrainingIndex,
     trainingRevealed,
-    streakTraining,
+    trainingHistory,
     initTraining,
     nextTraining,
     revealTraining,
@@ -30,10 +30,17 @@ export default function TrainingMode() {
   const normalize = (s: string) =>
     s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim()
 
+  // Codes déjà joués, séparés en deux listes pour la carte
+  const historyCodes = {
+    correct: trainingHistory.filter(r => r.correct).map(r => r.code),
+    wrong: trainingHistory.filter(r => !r.correct).map(r => r.code),
+  }
+
   const handleGuess = () => {
+    if (!userInput.trim()) return
     const isCorrect = normalize(userInput) === normalize(current.name)
     setFeedback(isCorrect ? 'correct' : 'wrong')
-    recordResultTraining(isCorrect ? true : false)
+    recordResultTraining(isCorrect)
     if (!isCorrect) revealTraining()
   }
 
@@ -56,11 +63,10 @@ export default function TrainingMode() {
         </button>
         <h1 className="text-lg font-bold text-yellow-900">🎯 Mode Entraînement</h1>
         <div className="flex opacity-0">
-          <span>← Accueil</span> {/* placeholder text */}
+          <span>← Accueil</span>
         </div>
       </div>
 
-      {/* Contenu */}
       <div className="flex flex-col lg:flex-row flex-1 gap-4 p-4 max-w-6xl mx-auto w-full">
 
         {/* Carte */}
@@ -69,26 +75,45 @@ export default function TrainingMode() {
             highlightedCode={current.code}
             correctCode={feedback === 'correct' ? current.code : undefined}
             revealCode={feedback === 'wrong' && trainingRevealed ? current.code : undefined}
+            previousCorrectCodes={historyCodes.correct}
+            previousWrongCodes={historyCodes.wrong}
           />
         </div>
 
         {/* Panel */}
         <div className="lg:w-80 flex flex-col gap-4">
 
-          {/* Serie d'entrainement */}
-          <div className="bg-white rounded-2xl shadow-lg p-6 text-center">
-            <p className="text-gray-500 text-sm mb-1">Nombre de bonne réponse d'affilées</p>
-            <p className="text-6xl font-bold text-yellow-700">{streakTraining}</p>
+          {/* Streak */}
+          <div className='flex bg-white rounded-2xl shadow-lg p-6 w-full'>
+            <div className="flex-1 text-center border-r border-background-yellow-monSite">
+              <p className="text-gray-500 text-sm mb-1">Bonnes réponses</p>
+              <p className="text-6xl font-bold text-yellow-700">
+                {historyCodes.correct.length}
+              </p>
+            </div>
+
+            <div className="flex-1 text-center">
+              <p className="text-gray-500 text-sm mb-1">Mauvaises réponses</p>
+              <p className="text-6xl font-bold text-yellow-700">
+                {historyCodes.wrong.length}
+              </p>
+            </div>
           </div>
 
-          {/* Numéro */}
-          <div className="bg-white rounded-2xl shadow-lg p-6 text-center">
-            <p className="text-gray-500 text-sm mb-1">Département n°</p>
-            <p className="text-6xl font-bold text-yellow-700">{current.code}</p>
+          {/* Progression */}
+          <div className="bg-white rounded-2xl shadow-lg px-6 py-3 text-center text-sm text-gray-500">
+            {currentTrainingIndex + 1} / {trainingQueue.length} départements
           </div>
 
           {/* Input / Feedback */}
           <div className="bg-white rounded-2xl shadow-lg p-6 flex flex-col gap-4">
+
+            {/* Numéro */}
+            <div className="text-center">
+              <p className="text-gray-500 text-sm mb-1">Département n°</p>
+              <p className="text-6xl font-bold text-yellow-700">{current.code}</p>
+            </div>
+
             {!feedback ? (
               <>
                 <DepartmentAutocomplete
@@ -106,10 +131,10 @@ export default function TrainingMode() {
                   Valider
                 </button>
                 <button
-                  onClick={() => { revealTraining() }}
+                  onClick={() => revealTraining()}
                   className="text-gray-400 text-sm hover:text-gray-600 transition cursor-pointer"
                 >
-                  Je ne sais pas
+                  Un indice ?
                 </button>
               </>
             ) : (
@@ -138,13 +163,14 @@ export default function TrainingMode() {
             )}
           </div>
 
-          {/* Infos révélées */}
+          {/* Zone d'indice */}
           {trainingRevealed && (
             <div className="bg-yellow-100 rounded-2xl p-4 text-sm text-yellow-900">
               <p><span className="font-semibold">Région :</span> {current.region}</p>
               <p><span className="font-semibold">Chef-lieu :</span> {current.capital}</p>
             </div>
           )}
+
         </div>
       </div>
     </div>

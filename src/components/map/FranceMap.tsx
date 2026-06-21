@@ -13,9 +13,10 @@ interface FranceMapProps {
   wrongCodes?: string[]
   correctCode?: string
   revealCode?: string
+  previousCorrectCodes?: string[]
+  previousWrongCodes?: string[]
 }
 
-// Dimensions fixes qui correspondent au viewBox
 const WIDTH = 800
 const HEIGHT = 800
 
@@ -25,6 +26,8 @@ export default function FranceMap({
   wrongCodes = [],
   correctCode,
   revealCode,
+  previousCorrectCodes = [],
+  previousWrongCodes = [],
 }: FranceMapProps) {
   const svgRef = useRef<SVGSVGElement>(null)
 
@@ -35,7 +38,6 @@ export default function FranceMap({
       const svg = d3.select(svgRef.current)
       svg.selectAll('*').remove()
 
-      // On utilise les dimensions fixes du viewBox, pas clientWidth/clientHeight
       const projection = d3.geoConicConformal()
         .center([2.454071, 46.279229])
         .scale(4200)
@@ -45,10 +47,15 @@ export default function FranceMap({
       const g = svg.append('g')
 
       const getFill = (code: string) => {
+        // Résultat courant en priorité
         if (code === correctCode) return '#22c55e'
         if (code === revealCode) return '#f97316'
         if (wrongCodes.includes(code)) return '#f87171'
+        // Département actuel en bleu
         if (code === highlightedCode) return '#3b82f6'
+        // Historique — version plus claire pour ne pas écraser le courant
+        if (previousCorrectCodes.includes(code)) return '#86efac' // green-300
+        if (previousWrongCodes.includes(code)) return '#fca5a5'  // red-300
         return '#e2e8f0'
       }
 
@@ -67,7 +74,14 @@ export default function FranceMap({
         })
         .on('mouseover', function (_, feature) {
           const code = (feature.properties as DepartmentProperties).code
-          if (code !== highlightedCode && code !== correctCode && code !== revealCode && !wrongCodes.includes(code)) {
+          if (
+            code !== highlightedCode &&
+            code !== correctCode &&
+            code !== revealCode &&
+            !wrongCodes.includes(code) &&
+            !previousCorrectCodes.includes(code) &&
+            !previousWrongCodes.includes(code)
+          ) {
             d3.select(this).attr('fill', '#93c5fd')
           }
         })
@@ -92,7 +106,7 @@ export default function FranceMap({
     }
 
     loadMap()
-  }, [highlightedCode, wrongCodes, correctCode, revealCode, onDepartmentClick])
+  }, [highlightedCode, wrongCodes, correctCode, revealCode, previousCorrectCodes, previousWrongCodes, onDepartmentClick])
 
   return (
     <svg
