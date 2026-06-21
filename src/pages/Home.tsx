@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom'
+import carte_france_fond_accueil from '../assets/carte_france_fond_accueil.jpg'
 
 export default function Home() {
   const navigate = useNavigate()
@@ -6,6 +7,12 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/50 flex flex-col items-center justify-center p-6 relative overflow-hidden">
       
+      {/* Image de fond */}
+      <div
+      className="absolute inset-0 bg-cover bg-center pointer-events-none scale-105"
+      style={{ backgroundImage: `url(${carte_france_fond_accueil})`, opacity: 0.5, filter: 'blur(2px)' }}
+    />
+
       {/* Cercles décoratifs flous en arrière-plan pour donner de la profondeur */}
       <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-blue-200/20 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-1/4 right-1/4 translate-x-1/2 translate-y-1/2 w-72 h-72 bg-emerald-200/20 rounded-full blur-3xl pointer-events-none" />
