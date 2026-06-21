@@ -12,9 +12,12 @@ export default function DailyMode() {
   const navigate = useNavigate()
   const { 
     streakDaily,
+    dailyRevealed,
     initDaily, 
     submitDailyGuess,
-    recordResult
+    recordResultDaily,
+    revealDaily,
+    nextDaily,
   } = useGameStore()
   const { isMobile } = useResponsive()
   
@@ -60,12 +63,16 @@ export default function DailyMode() {
     const newStatus = updatedDaily?.status ?? 'playing'
     const newGuesses = updatedDaily?.guesses ?? []
     const remaining = MAX_GUESSES - newGuesses.length
+    
+    if (remaining == 5) {revealDaily();}
 
     if (result === 'correct') {
-      recordResult(true)
+      recordResultDaily(true)
+      nextDaily()
       setMessage({ text: '🎉 Bravo, bonne réponse !', type: 'info' })
     } else if (newStatus === 'lost') {
-      recordResult(false)
+      recordResultDaily(false)
+      nextDaily()
       setMessage({ text: `💀 Perdu ! C'était ${department.name}`, type: 'error' })
     } else {
       setMessage({ text: `❌ Raté ! Il te reste ${remaining} essai${remaining > 1 ? 's' : ''}`, type: 'error' })
@@ -157,6 +164,7 @@ export default function DailyMode() {
                     Valider ({attemptsLeft} essai{attemptsLeft > 1 ? 's' : ''} restant{attemptsLeft > 1 ? 's' : ''})
                   </button>
                 </>
+                
             ) : (
               <div className="text-center flex flex-col gap-3">
                 {status === 'won' ? (
@@ -169,7 +177,7 @@ export default function DailyMode() {
                   <>
                     <p className="text-4xl">😔</p>
                     <p className="text-red-600 font-bold text-xl">Perdu !</p>
-                    <p className="text-gray-600">C'était le</p>
+                    <p className="text-gray-600">C'était le département</p>
                     <p className="text-gray-900 font-bold text-2xl">{department.name}</p>
                   </>
                 )}
@@ -180,8 +188,15 @@ export default function DailyMode() {
                 </div>
                 <p className="text-gray-400 text-xs">Reviens demain pour un nouveau département !</p>
               </div>
-            )}
+            )}            
           </div>
+          {/* Infos révélées */}
+            {dailyRevealed && (
+              <div className="bg-yellow-100 rounded-2xl p-4 text-sm text-yellow-900">
+                <p><span className="font-semibold">Région :</span> {department.region}</p>
+                <p><span className="font-semibold">Chef-lieu :</span> {department.capital}</p>
+              </div>
+            )}
         </div>
       </div>
     </div>
