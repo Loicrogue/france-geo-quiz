@@ -5,6 +5,7 @@ import DepartmentAutocomplete from '../components/DepartmentAutocomplete'
 import { useGameStore } from '../store/gameStore'
 import { departments } from '../data/departments'
 import useResponsive from '../hooks/useResponsive'
+import { validateGuessInput } from '../utils/validateGuess'
 
 const MAX_GUESSES = 10
 
@@ -49,8 +50,21 @@ export default function DailyMode() {
 
   const handleGuess = () => {
     if (!userInput.trim() || isFinished) return
-    
-    const result = submitDailyGuess(userInput.trim())
+
+    const validation = validateGuessInput(userInput)
+
+    if (validation.status === 'not_found') {
+      setMessage({ text: `Il n'existe pas de département "${validation.query}", veuillez réessayer.`, type: 'error' })
+      return
+    }
+
+    if (validation.status === 'ambiguous') {
+      setMessage({ text: `Plusieurs départements contiennent "${validation.query}", soyez plus précis !`, type: 'info' })
+      return
+    }
+
+    // status === 'valid' : on soumet le nom résolu (potentiellement autocomplété)
+    const result = submitDailyGuess(validation.resolvedName)
 
     if (result === 'already_guessed') {
       setMessage({ text: 'Tu as déjà proposé ce département !', type: 'info' })
@@ -61,8 +75,8 @@ export default function DailyMode() {
     const newStatus = updatedDaily?.status ?? 'playing'
     const newGuesses = updatedDaily?.guesses ?? []
     const remaining = MAX_GUESSES - newGuesses.length
-    
-    if (remaining == 5) {revealDaily();}
+
+    if (remaining === 5) revealDaily()
 
     if (result === 'correct') {
       recordResultDaily(true)

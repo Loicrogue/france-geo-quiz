@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import FranceMap from '../components/map/FranceMap'
 import DepartmentAutocomplete from '../components/DepartmentAutocomplete'
 import { useGameStore } from '../store/gameStore'
+import { validateGuessInput } from '../utils/validateGuess'
 
 export default function TrainingMode() {
   const navigate = useNavigate()
@@ -20,15 +21,14 @@ export default function TrainingMode() {
   const [userInput, setUserInput] = useState('')
   const [feedback, setFeedback] = useState<'correct' | 'wrong' | null>(null)
 
+  const [message, setMessage] = useState<string | null>(null)
+
   useEffect(() => {
     if (trainingQueue.length === 0) initTraining()
   }, [initTraining, trainingQueue.length])
 
   const current = trainingQueue[currentTrainingIndex]
   if (!current) return null
-
-  const normalize = (s: string) =>
-    s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim()
 
   const historyCodes = {
     correct: trainingHistory.filter(r => r.correct).map(r => r.code),
@@ -37,11 +37,29 @@ export default function TrainingMode() {
 
   const handleGuess = () => {
     if (!userInput.trim()) return
-    const isCorrect = normalize(userInput) === normalize(current.name)
+
+    const validation = validateGuessInput(userInput)
+
+    if (validation.status === 'not_found') {
+      setMessage(`Il n'existe pas de département "${validation.query}", veuillez réessayer.`)
+      return
+    }
+
+    if (validation.status === 'ambiguous') {
+      setMessage(`Plusieurs départements contiennent "${validation.query}", soyez plus précis !`)
+      return
+    }
+
+    // On compare le nom résolu avec le département courant
+    const normalize = (s: string) =>
+      s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim()
+
+    const isCorrect = normalize(validation.resolvedName) === normalize(current.name)
+    setMessage(null)
     setFeedback(isCorrect ? 'correct' : 'wrong')
     recordResultTraining(isCorrect)
     if (!isCorrect) revealTraining()
-  }
+}
 
   const handleNext = () => {
     setUserInput('')
@@ -118,6 +136,11 @@ export default function TrainingMode() {
 
             {!feedback ? (
               <>
+                {message && (
+                  <div className="p-3 rounded-xl text-xs font-semibold text-center border bg-blue-50 border-blue-100 text-blue-600">
+                    {message}
+                  </div>
+                )}
                 <DepartmentAutocomplete
                   value={userInput}
                   onChange={v => setUserInput(v)}
