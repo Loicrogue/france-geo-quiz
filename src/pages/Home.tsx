@@ -10,7 +10,7 @@ export default function Home() {
       {/* Image de fond */}
       <div
       className="absolute inset-0 bg-cover bg-center pointer-events-none scale-105"
-      style={{ backgroundImage: `url(${carte_france_fond_accueil})`, opacity: 0.5, filter: 'blur(2px)' }}
+      style={{ backgroundImage: `url(${carte_france_fond_accueil})`, opacity: 0.5, filter: 'blur(3px)' }}
     />
 
       {/* Cercles décoratifs flous en arrière-plan pour donner de la profondeur */}
@@ -30,7 +30,7 @@ export default function Home() {
           <h1 className="text-4xl md:text-5xl font-black tracking-tight text-slate-900">
             Bienvenue sur <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">France Géo Quiz</span>
           </h1>
-          <p className="text-slate-500 text-base md:text-lg max-w-sm mx-auto font-medium leading-relaxed">
+          <p className="text-slate-600 text-base md:text-lg max-w-sm mx-auto font-medium leading-relaxed">
             Prêt à tester tes connaissances sur les départements ? Choisis ton mode de jeu !
           </p>
         </div>
