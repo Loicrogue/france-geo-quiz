@@ -54,8 +54,8 @@ export default function FranceMap({
         // Département actuel en bleu
         if (code === highlightedCode) return '#3b82f6'
         // Historique — version plus claire pour ne pas écraser le courant
-        if (previousCorrectCodes.includes(code)) return '#86efac' // green-300
-        if (previousWrongCodes.includes(code)) return '#fca5a5'  // red-300
+        if (previousCorrectCodes.includes(code)) return '#22c55e'
+        if (previousWrongCodes.includes(code)) return '#f87171'
         return '#e2e8f0'
       }
 
