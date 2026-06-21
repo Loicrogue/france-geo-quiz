@@ -191,6 +191,7 @@ export default function DailyMode() {
                   <>
                     <div className="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center text-3xl mx-auto border border-emerald-100/50 shadow-sm">🏆</div>
                     <h3 className="text-emerald-800 font-black text-xl tracking-tight">Félicitations !</h3>
+                    <p className="text-slate-900 font-black text-2xl tracking-tight bg-slate-50 py-1.5 rounded-xl border border-slate-100">{department.name}</p>
                     <p className="text-slate-500 text-sm font-medium">Trouvé de main de maître en <span className="text-slate-800 font-bold">{guesses.length} essai{guesses.length > 1 ? 's' : ''}</span>.</p>
                   </>
                 ) : (
