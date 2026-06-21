@@ -15,7 +15,8 @@ interface GameStore {
   trainingQueue: Department[]
   currentTrainingIndex: number
   trainingRevealed: boolean
-  streak: number
+  streakDaily: number
+  streakTraining: number
   totalCorrect: number
   totalSeen: number
 
@@ -27,6 +28,7 @@ interface GameStore {
   nextTraining: () => void
   revealTraining: () => void
   recordResult: (correct: boolean) => void
+  recordResultTraining: (correct: boolean) => void
 
   // Actions daily
   initDaily: () => void
@@ -50,7 +52,8 @@ export const useGameStore = create<GameStore>()(
       trainingQueue: [],
       currentTrainingIndex: 0,
       trainingRevealed: false,
-      streak: 0,
+      streakDaily: 0,
+      streakTraining: 0,
       totalCorrect: 0,
       totalSeen: 0,
       daily: null,
@@ -76,7 +79,11 @@ export const useGameStore = create<GameStore>()(
       recordResult: (correct) => set(state => ({
         totalSeen: state.totalSeen + 1,
         totalCorrect: correct ? state.totalCorrect + 1 : state.totalCorrect,
-        streak: correct ? state.streak + 1 : 0,
+        streakDaily: correct ? state.streakDaily + 1 : 0,
+      })),
+
+      recordResultTraining: (correct) => set(state => ({
+        streakTraining: correct ? state.streakTraining + 1 : 0,
       })),
 
       initDaily: () => {

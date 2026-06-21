@@ -11,7 +11,7 @@ const MAX_GUESSES = 10
 export default function DailyMode() {
   const navigate = useNavigate()
   const { 
-    streak,
+    streakDaily,
     initDaily, 
     submitDailyGuess,
     recordResult
@@ -83,7 +83,7 @@ export default function DailyMode() {
           ← Accueil
         </button>
         <h1 className="text-lg font-bold text-green-900">🗓️ Département du Jour</h1>
-        <span>{isMobile ? "" : "Série de "}{streak} {streak <= 1 ? "jour" : "jours"}  🔥</span>
+        <span>{isMobile ? "" : "Série de "}{streakDaily} {streakDaily <= 1 ? "jour" : "jours"}  🔥</span>
       </div>
 
       <div className="flex flex-col lg:flex-row flex-1 gap-4 p-4 max-w-6xl mx-auto w-full">

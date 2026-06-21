@@ -10,9 +10,11 @@ export default function TrainingMode() {
     trainingQueue,
     currentTrainingIndex,
     trainingRevealed,
+    streakTraining,
     initTraining,
     nextTraining,
     revealTraining,
+    recordResultTraining,
   } = useGameStore()
 
   const [userInput, setUserInput] = useState('')
@@ -31,6 +33,7 @@ export default function TrainingMode() {
   const handleGuess = () => {
     const isCorrect = normalize(userInput) === normalize(current.name)
     setFeedback(isCorrect ? 'correct' : 'wrong')
+    recordResultTraining(isCorrect ? true : false)
     if (!isCorrect) revealTraining()
   }
 
@@ -71,6 +74,12 @@ export default function TrainingMode() {
 
         {/* Panel */}
         <div className="lg:w-80 flex flex-col gap-4">
+
+          {/* Serie d'entrainement */}
+          <div className="bg-white rounded-2xl shadow-lg p-6 text-center">
+            <p className="text-gray-500 text-sm mb-1">Nombre de bonne réponse d'affilées</p>
+            <p className="text-6xl font-bold text-yellow-700">{streakTraining}</p>
+          </div>
 
           {/* Numéro */}
           <div className="bg-white rounded-2xl shadow-lg p-6 text-center">
