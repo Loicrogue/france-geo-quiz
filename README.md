@@ -1,73 +1,59 @@
-# React + TypeScript + Vite
+# 🗺️ France Géo Quiz ( & Quiz Core Blueprint)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Bienvenue sur **France Géo Quiz**, une application web moderne, fluide et addictive dédiée à l'apprentissage des départements français. 
 
-Currently, two official plugins are available:
+Ce projet a été conçu avec une **architecture modulaire et hautement réutilisable**. La structure globale (State Management, Autocomplétion, Layouts Responsives, Gestion des Modes) sert de modèle (*Blueprint*) pour générer rapidement d'autres applications de quiz thématiques (Mécanique, Cinéma, Jeux Vidéo, Anatomie...).
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+## 🔗 Lien d'accès
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+L'application web est accessible depuis [le lien suivant](https://france-geo-quiz.netlify.app/).
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 🎮 Modes de Jeu
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+L'application s'articule autour de deux piliers majeurs de rétention et d'apprentissage :
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+* **🗓️ Département du Jour (Mode Daily) :** Inspiré des mécaniques à la *Wordle*. Le joueur dispose de 10 essais pour deviner le département secret du jour. 
+    * Système de **Série (Streak)** pour fidéliser l'utilisateur.
+    * Indices progressifs (Région, Chef-lieu) débloqués automatiquement à la moitié des essais.
+* **🎯 Mode Entraînement :** Un mode *Sandbox* infini basé sur une file d'attente dynamique. 
+    * Le jeu affiche un code/numéro de département, le joueur doit trouver son nom.
+    * Suivi des statistiques (bonnes/mauvaises réponses) en direct sur la session.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+---
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 🛠️ Stack Technique
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+L'application repose sur un écosystème moderne, performant et optimisé pour le responsive :
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+* **Framework :** [React](https://react.dev/) (Functional Components, Hooks avancés, `useRef` pour le contrôle des cycles d'initialisation).
+* **Routing :** [React Router DOM](https://reactrouter.com/) pour une navigation fluide en Single Page Application.
+* **State Management :** [Zustand](https://github.com/pmndrs/zustand) (`useGameStore`) pour une gestion globale de l'état, décorrélée de l'affichage UI.
+* **Styling :** [Tailwind CSS](https://tailwindcss.com/) avec l'approche *Premium Glass & Glow* (dégradés dynamiques, flous d'arrière-plan `blur-3xl`, et micro-interactions au clic/survol).
+
+---
+
+## 📁 Structure du Projet
+
+La logique est rigoureusement séparée pour faciliter la maintenance et le clonage vers d'autres thématiques :
+
+```text
+src/
+├── components/
+│   ├── map/
+│   │   └── FranceMap.tsx          # Composant SVG interactif et dynamique
+│   └── DepartmentAutocomplete.tsx # Input intelligent anti-typo
+├── data/
+│   └── departments.ts             # Base de données source (Code, Nom, Chef-lieu, Région)
+├── hooks/
+│   └── useResponsive.ts           # Hook maison pour les mode Mobile/Tablettte/PC
+├── store/
+│   └── gameStore.ts               # Coeur logique gérant les scores, les queues et l'historique
+└── pages/
+    ├── Home.tsx                   # Page d'accueil avec sélection des modes
+    ├── DailyMode.tsx              # Interface du défi quotidien
+    ├── TrainingMode.tsx           # Interface de l'entraînement infini
+    └── NotFound.tsx               # Écran d'erreur 404 stylisé
