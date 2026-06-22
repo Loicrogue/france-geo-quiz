@@ -1,1 +1,13 @@
 @import "tailwindcss";
+
+@theme {
+    --color-monSite: #222222;
+    --color-background-monSite: #dfe3e6;
+    --color-background-green-monSite: #cae4d4;
+    --color-background-yellow-monSite: #e4dfca;
+    --color-background-purple-monSite: #d9cae4;
+}
+
+.brouillon {
+    --color-test: #e4dfca;
+}
