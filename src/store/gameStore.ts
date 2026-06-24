@@ -21,6 +21,7 @@ interface GameStore {
   currentTrainingIndex: number
   trainingRevealed: boolean
   trainingHistory: TrainingResult[]
+  trainingFinished: boolean
 
   // Mode daily
   daily: DailyState | null
@@ -32,6 +33,7 @@ interface GameStore {
   nextTraining: () => void
   revealTraining: () => void
   recordResultTraining: (correct: boolean) => void
+  resetTrainingFinished: () => void
   
   // Actions daily
   initDaily: () => void
@@ -59,6 +61,7 @@ export const useGameStore = create<GameStore>()(
       currentTrainingIndex: 0,
       trainingRevealed: false,
       trainingHistory: [],
+      trainingFinished: false,
       dailyRevealed: false,
       streakDaily: 0,
       daily: null,
@@ -74,17 +77,22 @@ export const useGameStore = create<GameStore>()(
         const { currentTrainingIndex, trainingQueue } = get()
         const next = currentTrainingIndex + 1
         if (next >= trainingQueue.length) {
-          // Tous les départements faits → on repart avec une liste vierge
           set({
-            trainingQueue: shuffle(departments),
-            currentTrainingIndex: 0,
-            trainingRevealed: false,
-            trainingHistory: [],
+            trainingFinished: true,
           })
         } else {
           set({ currentTrainingIndex: next, trainingRevealed: false })
         }
       },
+
+      resetTrainingFinished: () => set({
+        // Tous les départements faits → on repart avec une liste vierge
+        trainingQueue: shuffle(departments),
+        currentTrainingIndex: 0,
+        trainingRevealed: false,
+        trainingHistory: [],
+        trainingFinished: false,
+      }),
 
       revealTraining: () => set({ trainingRevealed: true }),
 

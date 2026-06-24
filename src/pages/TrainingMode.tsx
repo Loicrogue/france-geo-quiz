@@ -4,6 +4,7 @@ import FranceMap from '../components/map/FranceMap'
 import DepartmentAutocomplete from '../components/DepartmentAutocomplete'
 import { useGameStore } from '../store/gameStore'
 import { validateGuessInput } from '../utils/validateGuess'
+import { getTrainingEndMessage } from '../utils/trainingMessages'
 
 export default function TrainingMode() {
   const navigate = useNavigate()
@@ -12,10 +13,12 @@ export default function TrainingMode() {
     currentTrainingIndex,
     trainingRevealed,
     trainingHistory,
+    trainingFinished,
     initTraining,
     nextTraining,
     revealTraining,
     recordResultTraining,
+    resetTrainingFinished,
   } = useGameStore()
 
   const [userInput, setUserInput] = useState('')
@@ -29,6 +32,90 @@ export default function TrainingMode() {
 
   const current = trainingQueue[currentTrainingIndex]
   if (!current) return null
+
+  if (trainingFinished) {
+    const correctCount = trainingHistory.filter(r => r.correct).length
+    const wrongCount = trainingHistory.filter(r => !r.correct).length
+    const { emoji, title, message } = getTrainingEndMessage(correctCount)
+
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-amber-100 to-slate-100 flex flex-col relative overflow-hidden">
+        <div className="absolute top-20 right-10 w-96 h-96 bg-amber-300/40 rounded-full blur-3xl pointer-events-none" />
+
+        <header className="bg-white/80 backdrop-blur-md border-b border-slate-100 sticky top-0 z-50 px-6 py-3.5 flex items-center justify-between">
+          <button
+            onClick={() => navigate('/')}
+            className="flex items-center gap-1.5 text-slate-500 hover:text-slate-800 font-medium transition text-sm cursor-pointer group"
+          >
+            <span className="transform group-hover:-translate-x-0.5 transition-transform">←</span> Accueil
+          </button>
+          <h1 className="text-base md:text-lg font-black tracking-tight text-slate-900 flex items-center gap-2">
+            <span className="text-xl">🎯</span> Mode Entraînement
+          </h1>
+          <div className="w-20 opacity-0 pointer-events-none hidden sm:block" />
+        </header>
+
+        <main className="flex flex-1 items-center justify-center p-6 z-10">
+          <div className="bg-white rounded-3xl border border-slate-100 shadow-2xl shadow-slate-200/60 p-8 max-w-md w-full text-center flex flex-col gap-6">
+
+            {/* Emoji résultat */}
+            <div className="w-20 h-20 bg-amber-50 rounded-2xl flex items-center justify-center text-4xl mx-auto border border-amber-100 shadow-sm">
+              {emoji}
+            </div>
+
+            {/* Titre */}
+            <div>
+              <h2 className="text-2xl font-black text-slate-900 tracking-tight">{title}</h2>
+              <p className="text-slate-500 text-sm mt-2 leading-relaxed">{message}</p>
+            </div>
+
+            {/* Score */}
+            <div className="flex gap-4 justify-center">
+              <div className="flex-1 bg-emerald-50 border border-emerald-100 rounded-2xl p-4">
+                <p className="text-3xl font-black text-emerald-600">{correctCount}</p>
+                <p className="text-xs font-bold text-emerald-500 mt-1 uppercase tracking-wider">Corrects</p>
+              </div>
+              <div className="flex-1 bg-rose-50 border border-rose-100 rounded-2xl p-4">
+                <p className="text-3xl font-black text-rose-500">{wrongCount}</p>
+                <p className="text-xs font-bold text-rose-400 mt-1 uppercase tracking-wider">Ratés</p>
+              </div>
+              <div className="flex-1 bg-slate-50 border border-slate-100 rounded-2xl p-4">
+                <p className="text-3xl font-black text-slate-700">
+                  {Math.round((correctCount / 96) * 100)}%
+                </p>
+                <p className="text-xs font-bold text-slate-400 mt-1 uppercase tracking-wider">Réussite</p>
+              </div>
+            </div>
+
+            {/* Barre de progression */}
+            <div className="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+              <div
+                className="h-full bg-gradient-to-r from-amber-400 to-emerald-500 rounded-full transition-all duration-700"
+                style={{ width: `${Math.round((correctCount / 96) * 100)}%` }}
+              />
+            </div>
+
+            {/* Actions */}
+            <div className="flex flex-col gap-3">
+              <button
+                onClick={resetTrainingFinished}
+                className="w-full bg-amber-500 text-white py-3.5 rounded-xl font-bold shadow-lg shadow-amber-500/20 hover:bg-amber-400 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
+              >
+                🔄 Recommencer l'entraînement
+              </button>
+              <button
+                onClick={() => navigate('/')}
+                className="w-full bg-slate-100 text-slate-700 py-3 rounded-xl font-bold hover:bg-slate-200 transition-all cursor-pointer text-sm"
+              >
+                ← Retour à l'accueil
+              </button>
+            </div>
+          </div>
+        </main>
+      </div>
+    )
+  }
+
 
   const historyCodes = {
     correct: trainingHistory.filter(r => r.correct).map(r => r.code),
