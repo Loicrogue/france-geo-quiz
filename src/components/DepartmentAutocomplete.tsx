@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { departments } from '../data/departments'
+import useResponsive from '../hooks/useResponsive'
 
 interface Props {
   value: string
@@ -22,6 +23,9 @@ export default function DepartmentAutocomplete({
 }: Props) {
   const [open, setOpen] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
+
+    const { isMobile } = useResponsive()
+
 
   // Recherche par initiales des mots : "lo" matche "Loir-et-Cher", "Loire", "Lot"
   // "lo a" matche "Loire-Atlantique", "Lot-et-Garonne"
@@ -101,7 +105,7 @@ export default function DepartmentAutocomplete({
         className={`w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-lg focus:outline-none ${borderColor} transition disabled:opacity-50`}
       />
       {open && suggestions.length > 0 && (
-        <ul className="absolute z-10 w-full bg-white border border-gray-200 rounded-xl shadow-lg mt-1 overflow-hidden">
+        <ul className={`absolute z-10 w-full bg-white border border-gray-200 rounded-xl shadow-lg mt-1 overflow-y-auto ${isMobile ? "max-h-40" : "max-h-90"}`}>
           {suggestions.map(d => (
             <li
               key={d.code}

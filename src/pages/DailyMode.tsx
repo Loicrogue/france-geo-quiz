@@ -228,6 +228,17 @@ export default function DailyMode() {
             )}        
           </div>
 
+          {/* Révélations d'indices en cours */}
+          {!dailyRevealed && !isFinished && (
+            <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-100 rounded-2xl p-4 text-xs text-amber-900 space-y-1 shadow-sm">
+              <p className="font-bold uppercase tracking-wider text-[10px] text-amber-600 mb-1">
+                🔍 {MAX_GUESSES - guesses.length - 5} essai{MAX_GUESSES - guesses.length - 5 > 1 ? 's' : ''} avant de débloquer les indices...
+              </p>
+              <p><span className="font-bold text-amber-800/80">Région :</span> ?????</p>
+              <p><span className="font-bold text-amber-800/80">Chef-lieu :</span> ?????</p>
+            </div>
+          )}
+
           {/* Révélations d'indices de secours */}
           {dailyRevealed && (
             <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-100 rounded-2xl p-4 text-xs text-amber-900 space-y-1 shadow-sm">
